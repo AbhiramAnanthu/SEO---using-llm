@@ -15,17 +15,17 @@ db = client.sample_mflix
 collection = db.movies
 
 
-def get_search_results(text: str):
+def generate_embedding(collection_name: str, field_name: str):
     chroma_client = chromadb.Client()
-    print(chroma_client.list_collections())
-    embedd_collections = chroma_client.get_collection("movie_search")
-    if embedd_collections == None:
-        embedd_collections = chroma_client.create_collection("movie_search")
-    # Fetch documents with "plot" field
-    documents = list(collection.find({"plot": {"$exists": True}}).limit(50))
+    try:
+        embedd_collections = chroma_client.get_collection(collection_name)
+    except Exception as e:
+        embedd_collections = chroma_client.create_collection(collection_name)
+
+    documents = list(collection.find({field_name: {"$exists": True}}).limit(50))
 
     # Generate embeddings for the "plot" field
-    embeddings = model.encode([doc["plot"] for doc in documents])
+    embeddings = model.encode([doc[field_name] for doc in documents])
 
     # Generate unique IDs for each document
     ids = [f"id_{i}" for i in range(len(documents))]
@@ -41,9 +41,14 @@ def get_search_results(text: str):
                 {"_id": str(doc["_id"])}
             ],  # Optional: Store MongoDB _id as metadata
         )
+
+    return embedd_collections
+
+
+def search_embedding(text: str, collection_name: str) -> object:
     data = []
     query = model.encode(text)
-    results = embedd_collections.query(query_embeddings=query)
+    results = collection_name.query(query_embeddings=query)
     results_id = [id for id in results["metadatas"][0]]
     for id in results_id:
         id_str = id["_id"]
@@ -55,3 +60,5 @@ def get_search_results(text: str):
             }
         )
     return data
+
+
