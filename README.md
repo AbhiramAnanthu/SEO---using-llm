@@ -18,7 +18,9 @@ Vector Movie Search is a powerful application that leverages vector embeddings t
 - **MongoDB**: For storing movie data.
 - **ChromaDB**: For managing vector embeddings and performing searches.
 - **Streamlit**: (Optional) For building a user-friendly web interface.
-
+  
+## Demo video
+[Link to video](https://drive.google.com/file/d/1iU5juyMUfEqZCAbPcmzwG-JLGaQk17SP/view?usp=sharing)
 ## Installation
 
 1. Clone the repository:
